@@ -12,12 +12,15 @@ bearing_D=22;
 bearing_dint=7;
 bearing_th=7;
 //x trail:
-dx_guidey=80;
+dx_guidey=60;
 dz_guidey=profile_size+1;
 //x trail plate:
 xtrailPlateThickness=3;
 xtrailPlate_dz=60;
-
+//head:
+headPlateThickness=5;
+headPlate_dx=dx_guidey-profile_size;
+headPlate_dy=80;
 
 ensemble();
 
@@ -46,6 +49,13 @@ for (i=[-1,1])
     translate([0,i*(profiley_length/2+xtrailPlateThickness/2),dz_guidey+profile_size/2])xtrailPlate();
    
     }
+    
+//head:
+ translate([-headPlate_dx/2,-headPlate_dy/2,dz_guidey+profile_size/2+2]) cube([headPlate_dx,  headPlate_dy,headPlateThickness]);
+//example of extuder:    
+ translate([0,0,dz_guidey+profile_size/2+headPlateThickness])color("blue")rotate([0,0,0])import("extruder.stl");    
+    
+
 }
 
 

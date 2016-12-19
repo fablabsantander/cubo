@@ -22,6 +22,63 @@ headPlateThickness=5;
 headPlate_dx=dx_guidey-profile_size;
 headPlate_dy=80;
 
+//dim cube:
+thickness_panel = 10;
+cube_length_x = profilex_length+2*thickness_panel;
+cube_length_y = profiley_length+2*profile_size;
+h_stop_extruder = 120;
+height_cube = profilex_length+h_stop_extruder+2*thickness_panel;
+
+//windows cube:
+    difference(){      
+ensemble_cube();
+translate([0,0,-height_cube/2+h_stop_extruder])      
+        union(){ 
+cube([2*cube_length_x,cube_length_y-cube_length_x*2/5,+height_cube*3/5],center=true);     
+rotate([0,0,90])
+translate([-cube_length_x/2,0,0])    
+cube([cube_length_x,cube_length_y-cube_length_x*2/5,height_cube*3/5],center=true);
+rotate([0,90,0])
+translate([-cube_length_x/2,0,0])    
+cube([cube_length_x,cube_length_y-cube_length_x*1/4,height_cube*3/5],center=true);
+        }   
+    }
+
+module ensemble_cube()
+{
+//upper panel:
+color("orange")
+translate ([-cube_length_x/2,-cube_length_y/2-thickness_panel,h_stop_extruder-thickness_panel])
+cube([cube_length_x,cube_length_y+2*thickness_panel,thickness_panel]);
+//bottom panel:
+color("orange")
+translate ([-cube_length_x/2,-cube_length_y/2-thickness_panel,-height_cube+h_stop_extruder])
+cube([cube_length_x,cube_length_y+2*thickness_panel,thickness_panel]);
+//left panel:
+color("orange")
+translate ([cube_length_x/2-thickness_panel,-cube_length_y/2-thickness_panel,-height_cube+h_stop_extruder+thickness_panel])
+cube([thickness_panel,cube_length_y+thickness_panel,height_cube-2*thickness_panel]); 
+//right panel (Left mirrored):
+mirror(0,1,0){
+color("orange")
+translate ([cube_length_x/2-thickness_panel,-cube_length_y/2-thickness_panel,-height_cube+h_stop_extruder+thickness_panel])
+cube([thickness_panel,cube_length_y+thickness_panel,height_cube-2*thickness_panel]);
+}    
+//back panel:
+color("orange")
+translate ([-cube_length_x/2,cube_length_y/2,-height_cube+h_stop_extruder+thickness_panel])
+cube([cube_length_x,thickness_panel,height_cube-10*thickness_panel]);
+//front panel:
+color("cyan")
+translate ([-cube_length_x/2,-cube_length_y/2-2*thickness_panel,-height_cube+h_stop_extruder])
+cube([cube_length_x,thickness_panel,height_cube]);
+//tirador puerta:
+color("black")
+translate([cube_length_x/2-50,-cube_length_y/2-3*thickness_panel,-height_cube/2+h_stop_extruder])
+sphere(r=12.5,$fn=20);
+
+}
+
 ensemble();
 
 //xtrailPlate();

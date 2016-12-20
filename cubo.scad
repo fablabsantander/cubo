@@ -13,7 +13,7 @@ bearing_dint=7;
 bearing_th=7;
 //x trail:
 dx_guidey=60;
-dz_guidey=profile_size;
+dz_guidey=profile_size-0.5;
 //x trail plate:
 xtrailPlateThickness=3;
 //head:

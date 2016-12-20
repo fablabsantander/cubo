@@ -16,7 +16,7 @@ Coding conventions for openscad files:
 - try to use parameters for all dimensions such we have not to redesign when changing one piece dimension.
 - minimize the number of parameters
 - put the parameters at the beginning of the file with explicit names and comments
-- then put the modules to be 3D printed (comented)
+- then put the modules to be 3D printed (commented)
 - then put the module called "ensemble" that gather all the pieces
 - then put eventually cut views
 - the put the modules

@@ -19,4 +19,4 @@ Coding conventions for openscad files:
 - then put the modules to be 3D printed (commented)
 - then put the module called "ensemble" that gather all the pieces
 - then put eventually cut views
-- the put the modules
+- then put the modules

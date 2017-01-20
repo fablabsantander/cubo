@@ -2,6 +2,11 @@
 //machine "cubo"
 //licence creative common 
 
+
+
+
+
+
 //profile:
 profilex_length=500;
 profiley_length=500;
@@ -20,6 +25,34 @@ xtrailPlateThickness=3;
 headPlateThickness=5;
 headPlate_dx=dx_guidey-profile_size;
 headPlate_dy=80;
+
+//stepper motor nema17:
+motNema17Side=42;
+motNema17Dep=47.65;
+motNema17AxisD=5;
+motNema17AxisL=26;
+motNema17ScrewFixD=3;
+motNema17ScrewsDist=31;
+motNema17FrontD=22;
+motNema17FrontH=1.5;
+//motor pulley
+pulleyDiameter=20;
+pulleyThickness=8;
+//belts:
+belt_th=6;//betl thickness
+z_belts=-5;
+
+
+
+head_X=50;
+head_Y=0;
+
+
+
+
+
+
+
 
 ensemble();
 
@@ -45,6 +78,8 @@ for (i=[-1,1])
 translate([-profilex_length/2,i*(-profiley_length/2-10-bearing_th/2),0])rotate([0,90,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
 
 //guides for y translation
+translate([head_X,0,0])//Y carriage ensemble
+{
 for (i=[-1,1])
     {
     //guides y
@@ -86,7 +121,39 @@ mirror([0,1,0]) translate([0,profiley_length/2+xtrailPlateThickness/2,dz_guidey+
  translate([-headPlate_dx/2,-headPlate_dy/2,dz_guidey+profile_size/2+2]) cube([headPlate_dx,  headPlate_dy,headPlateThickness]);
 //example of extuder:    
  translate([0,0,dz_guidey+profile_size/2+headPlateThickness])color("blue")rotate([0,0,0])import("extruder.stl");    
-    
+
+
+//pulleys fixed on the Y guides:
+for (y=[-1,1])translate([-dx_guidey/2,y*(profiley_length*0.45-bearing_D/2),z_belts]) bearing();
+
+
+
+
+}//end of X carriage ensemble
+
+translate([0,0,z_belts])
+{
+
+coef=0.45;
+for (y=[-1,1])
+	{
+	//stepper motors:
+	translate([-profilex_length/2+motNema17Side/2,y*profiley_length*coef,-bearing_th])rotate([0,-90,0])color("skyblue")motor_nema17();
+	//pulleys on steppers:
+	translate([-profilex_length/2+motNema17Side/2,y*profiley_length*coef,0]) bearing();
+	//pulleys on the other side:
+	translate([profilex_length*0.47,y*profiley_length*coef,0]) bearing();
+	}
+
+//belt
+color("black")translate([profilex_length*0.47+bearing_D/2,-profiley_length*coef,-belt_th/2])cube([2,profiley_length*coef*2,belt_th]);
+for (y=[-1,1])
+	{
+	color("black")translate([-profilex_length/2+motNema17Side/2,y*(profiley_length*coef+bearing_D/2),-belt_th/2])cube([profiley_length*coef*2,2,belt_th]);
+	color("black")translate([-profilex_length/2+motNema17Side/2,y*(profiley_length*coef-bearing_D/2),-belt_th/2])cube([profiley_length/2,2,belt_th]);
+	}
+
+}
 
 }
 
@@ -233,4 +300,24 @@ difference()
     cylinder(r=bearing_D/2,h=bearing_th);
     translate([0,0,-1])cylinder(r=bearing_dint/2,h=bearing_th+2);  
     }
+}
+
+
+
+
+module motor_nema17()
+{
+//moteur
+difference()
+	{
+	translate([-motNema17Dep/2,0,0])	cube (size=[motNema17Dep,motNema17Side,motNema17Side],center=true);
+	//screw holes:
+	for(i=[-1,1])for(j=[-1,1])translate([-8,i*motNema17ScrewsDist/2,j*motNema17ScrewsDist/2]) rotate([0,90,0]) cylinder(h=10,r=1.5,$fn=10);
+	}
+//rehaut
+rotate([0,90,0]) cylinder(h=motNema17FrontH,r=motNema17FrontD/2,center=false,$fn=20);
+
+//axe moteur
+translate([motNema17FrontH,0,0])rotate([0,90,0]) cylinder(h=motNema17AxisL,r=motNema17AxisD/2,center=false,$fn=20);
+
 }

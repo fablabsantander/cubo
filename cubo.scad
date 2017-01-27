@@ -16,6 +16,10 @@ profile_screw_D=5;
 bearing_D=22;
 bearing_dint=7;
 bearing_th=7;
+
+//distance between the 2 guides x
+inter_guides_x=profiley_length/2+10+bearing_th/2;
+echo("distance between the 2 guides x:",inter_guides_x,"mm");
 //x trail:
 dx_guidey=60;
 dz_guidey=profile_size-0.5;
@@ -40,7 +44,7 @@ pulleyDiameter=20;
 pulleyThickness=8;
 //belts:
 belt_th=6;//betl thickness
-z_belts=-5;
+z_belts=3;
 
 
 
@@ -54,10 +58,10 @@ head_Y=0;
 
 
 
-ensemble();
+//ensemble();
 
 //rotate([-90,0,0])xtrailPlate();
-//bearingPusher();
+bearingPusher();
 
 //dim cube:
 thickness_panel = 10;
@@ -73,6 +77,11 @@ module ensemble()
 //the clothes of the machine:
 //cover();
 
+/*
+translate([profilex_length/2,0,0]) provisory_side_plate();
+mirror([1,0,0])translate([profilex_length/2,0,0]) provisory_side_plate();
+*/
+	
 //guides for x translation
 for (i=[-1,1])
 translate([-profilex_length/2,i*(-profiley_length/2-10-bearing_th/2),0])rotate([0,90,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
@@ -124,7 +133,7 @@ mirror([0,1,0]) translate([0,profiley_length/2+xtrailPlateThickness/2,dz_guidey+
 
 
 //pulleys fixed on the Y guides:
-for (y=[-1,1])translate([-dx_guidey/2,y*(profiley_length*0.45-bearing_D/2),z_belts]) bearing();
+for (y=[-1,1])translate([-dx_guidey/2,y*(profiley_length*0.45-bearing_D),z_belts]) bearing();
 
 
 
@@ -173,19 +182,19 @@ difference()
 		//plate that connects the lower bearing:
 		translate([-(profile_size)/2,-xtrailPlateThickness/2,-xtrailPlate_dz*1.7]) cube([a,xtrailPlateThickness,xtrailPlate_dz]);
 		//rounded plate:
-		translate([0,xtrailPlateThickness/2,-xtrailPlate_dz*1.65])  rotate([90,0,0]) cylinder(h=xtrailPlateThickness,r=xtrailPlate_dz*0.5,$fn=70);
+		translate([0,xtrailPlateThickness/2,-xtrailPlate_dz*1.6])  rotate([90,0,0]) cylinder(h=xtrailPlateThickness,r=xtrailPlate_dz*0.5,$fn=70);
 		//vertical reinforcement:
 		translate([-xtrailPlateThickness/2,-a*0.3,-a*1.8]) cube([xtrailPlateThickness,a*0.3,a*1.8]);
 		//horizontal reinforcement:
 		translate([-(dx_guidey-profile_size-2)/2,-a*0.3,-xtrailPlateThickness]) cube([dx_guidey-profile_size-2,a*0.3,xtrailPlateThickness]);
 		// screw pressing holder: 
-		translate([0,-a+xtrailPlateThickness/2,-a*1.65])translate([-a/4,0,-a/2]) cube([a/2,a,a/2]);
+		translate([0,-a+xtrailPlateThickness/2,-a*1.6])translate([-a/4,0,-a/2]) cube([a/2,a,a/2]);
 	  	}
     //holes
 	translate([0,0,-dz_guidey-a/2])
         for (i=[-1,1]) for (k=[-1,1])translate([i*-dx_guidey/2,0,k*dz_guidey])rotate([90,0,0])cylinder(r=       profile_screw_D/2,h=40,$fn=20,center=true);
 	// screw pressing holder: 
-	translate([0,-a+xtrailPlateThickness/2,-a*1.65])
+	translate([0,-a+xtrailPlateThickness/2,-a*1.6])
 		{
 		translate([-a/8,-a/2,-a/2-1]) cube([a/4,profile_size,a/2+2]);
 		//hole for rotation axis:
@@ -202,6 +211,7 @@ difference()
 module bearingPusher()
 {
 a=profile_size;
+translate([0,0,1])
 difference()
 	{
 	union()
@@ -275,6 +285,27 @@ translate([cube_length_x/2-50,-cube_length_y/2-3*thickness_panel,-height_cube/2+
 sphere(r=12.5,$fn=20);
 
 }
+
+
+
+/*
+plates use to test the X Y system:
+*/
+module provisory_side_plate()
+{
+h=100;
+dy=profiley_length+50;
+color("orange")
+difference()
+	{
+	translate ([0,-dy/2,-h+20]) cube([thickness_panel,dy,h]);
+	for (y=[-1,1])translate ([profilex_length*0.3,y*(inter_guides_x),0])rotate([0,90,0])cylinder(h=200,r=5/2,$fn=20);
+	}
+}
+
+
+
+
 
 
 module bearingAdaptor()

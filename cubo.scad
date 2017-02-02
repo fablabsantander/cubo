@@ -46,6 +46,8 @@ pulleyThickness=16;
 //belts:
 belt_th=6;//betl thickness
 z_belts=3;
+//half distance between pulley in y direction
+inter_pulleys_y=profiley_length*0.46;
 
 
 
@@ -55,13 +57,13 @@ head_Y=0;
 
 
 
-ensemble();
+//ensemble();
 
 //rotate([-90,0,0])xtrailPlate();
 //bearingPusher();
 //bearingAdaptor(); 
 //stepper_holder();
-
+pulley_holder();
 
 //dim cube:
 thickness_panel = 10;
@@ -168,26 +170,31 @@ for (y=[-1,1])translate([-dx_guidey/2,y*(profiley_length*0.45-bearing_D),z_belts
 translate([0,0,z_belts])
 {
 
-coef=0.46;
-for (y=[-1,1])
+for (c=[0,1]) mirror([0,c,0])
 	{
 	//stepper holder:
-	translate([-profilex_length/2+motNema17Side/2,y*profiley_length*coef,-17])stepper_holder();
-		
+	translate([-profilex_length/2+motNema17Side/2,inter_pulleys_y,-17])stepper_holder();
+	//pulley holder:
+	translate([profilex_length*0.47,-inter_guides_x-profile_size/2,-17])pulley_holder();
+	}
+
+for (y=[-1,1])
+	{
 	//stepper motors:
-	translate([-profilex_length/2+motNema17Side/2,y*profiley_length*coef,-17])rotate([0,-90,0])color("skyblue")motor_nema17();
+	translate([-profilex_length/2+motNema17Side/2,y*inter_pulleys_y,-17])rotate([0,-90,0])color("skyblue")motor_nema17();
 	//GT2 pulleys on steppers:
-	color("grey")translate([-profilex_length/2+motNema17Side/2,y*profiley_length*coef,-pulleyThickness*0.7]) pulley();//bearing();
+	color("grey")translate([-profilex_length/2+motNema17Side/2,y*inter_pulleys_y,-pulleyThickness*0.7]) pulley();//bearing();
 	//pulleys on the other side:
-	translate([profilex_length*0.47,y*profiley_length*coef,0]) bearing();
+	translate([profilex_length*0.47,y*inter_pulleys_y,0]) bearing();
 	}
 
 //belt
-color("black")translate([profilex_length*0.47+bearing_D/2,-profiley_length*coef,-belt_th/2])cube([2,profiley_length*coef*2,belt_th]);
+color("black")translate([profilex_length*0.47+bearing_D/2,-inter_pulleys_y,-belt_th/2])cube([2,inter_pulleys_y*2,belt_th]);
+//belts:
 for (y=[-1,1])
 	{
-	color("black")translate([-profilex_length/2+motNema17Side/2,y*(profiley_length*coef+bearing_D/2),-belt_th/2])cube([profiley_length*coef*2,2,belt_th]);
-	color("black")translate([-profilex_length/2+motNema17Side/2,y*(profiley_length*coef-bearing_D/2),-belt_th/2])cube([profiley_length/2,2,belt_th]);
+	color("black")translate([-profilex_length/2+motNema17Side/2,y*(inter_pulleys_y+bearing_D/2),-belt_th/2])cube([inter_pulleys_y*2,2,belt_th]);
+	color("black")translate([-profilex_length/2+motNema17Side/2,y*(inter_pulleys_y-bearing_D/2),-belt_th/2])cube([profiley_length/2,2,belt_th]);
 	}
 
 }
@@ -201,10 +208,32 @@ module stepper_holder()
 {
 difference()
 	{
+	//main plate
 	translate([-motNema17Side/2,-motNema17Side/2,0])cube([motNema17Side,65,4]);
+	//place for the stepper head:
 	translate([0,0,-1])cylinder(r=(motNema17FrontD+1)/2,h=20,$fn=30);
+	//holes to fix on the rails with M5 screws:
 	for (x=[-1,1]) translate([10*x,33.5,-1])cylinder(r=5/2,h=20,$fn=30);
+	//hole to fix the stepper motor nema17
 	for (x=[-1,1])for (y=[-1,1])translate([motNema17ScrewsDist/2*x,motNema17ScrewsDist/2*y,-1])cylinder(r=3.5/2,h=20,$fn=30);
+	}
+}
+	
+	
+	
+//pulley holder:
+module pulley_holder()
+{
+ax=20;
+ay=50;
+difference()
+	{
+	//main plate
+	translate([-ax/2,0,0])cube([ax,ay,4]);
+	//hole for the pulley axis:
+	translate([0,inter_guides_x+profile_size/2-inter_pulleys_y,-1])cylinder(r=(5)/2,h=20,$fn=30);
+	//holes to fix on the rails with M5 screws:
+	for (x=[-1,1]) translate([5*x,profile_size/2,-1])cylinder(r=5/2,h=20,$fn=30);
 	}
 }
 	

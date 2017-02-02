@@ -19,15 +19,15 @@ bearing_th=7;
 
 //distance between the 2 guides x
 inter_guides_x=profiley_length/2+10+bearing_th/2;
-echo("distance between the 2 guides x:",inter_guides_x,"mm");
+echo("distance between the 2 guides x:",2*inter_guides_x,"mm");
 //x trail:
 dx_guidey=60;
-dz_guidey=profile_size-0.5;
+dz_guidey=profile_size/2+bearing_D/2-1.5;//profile_size-0.5;
 //x trail plate:
 xtrailPlateThickness=3;
 //head:
 headPlateThickness=5;
-headPlate_dx=dx_guidey-profile_size;
+headPlate_dx=dx_guidey-profile_size-2;
 headPlate_dy=80;
 
 //stepper motor nema17:
@@ -39,9 +39,10 @@ motNema17ScrewFixD=3;
 motNema17ScrewsDist=31;
 motNema17FrontD=22;
 motNema17FrontH=1.5;
-//motor pulley
-pulleyDiameter=20;
-pulleyThickness=8;
+//motor pulley GT2
+pulleyTeethDiameter=12;
+pulleyDiameter=16;
+pulleyThickness=16;
 //belts:
 belt_th=6;//betl thickness
 z_belts=3;
@@ -54,14 +55,13 @@ head_Y=0;
 
 
 
-
-
-
-
-//ensemble();
+ensemble();
 
 //rotate([-90,0,0])xtrailPlate();
-bearingPusher();
+//bearingPusher();
+//bearingAdaptor(); 
+//stepper_holder();
+
 
 //dim cube:
 thickness_panel = 10;
@@ -77,10 +77,10 @@ module ensemble()
 //the clothes of the machine:
 //cover();
 
-/*
+
 translate([profilex_length/2,0,0]) provisory_side_plate();
 mirror([1,0,0])translate([profilex_length/2,0,0]) provisory_side_plate();
-*/
+
 	
 //guides for x translation
 for (i=[-1,1])
@@ -127,10 +127,35 @@ mirror([0,1,0]) translate([0,profiley_length/2+xtrailPlateThickness/2,dz_guidey+
 	}
   
 //head:
- translate([-headPlate_dx/2,-headPlate_dy/2,dz_guidey+profile_size/2+2]) cube([headPlate_dx,  headPlate_dy,headPlateThickness]);
+head_bearing_axis_z=profile_size/2+bearing_D/2-1.5;
+translate([0,head_Y,dz_guidey])
+	{
+	//bearings
+	 for (x=[-1,1]) for (y=[-1,1]) translate([x*dx_guidey/2,y*headPlate_dy*0.4,head_bearing_axis_z])rotate([0,0,90])
+		{
+		rotate([90,0,0])bearing();
+		}
+	//plate to print:
+	//bearing holders size:	
+	aay=15;
+	aax=4;
+	aaz=30;
+	difference()
+		{
+		union()
+			{
+			//main base:
+			translate([-headPlate_dx/2,-headPlate_dy/2,0]) cube([headPlate_dx,  headPlate_dy,headPlateThickness]);
+			//bearing holders:
+			for (x=[-1,1]) for (y=[-1,1]) translate([x*(headPlate_dx-aax)*0.5-aax/2,y*headPlate_dy*0.4-aay/2,0])cube([aax,aay,aaz]);
+			}
+		translate([0,0,-1])cylinder(r=14,h=50,$fn=30);
+		for (y=[-1,1])translate([0,25*y,-1])cylinder(r=2,h=50,$fn=30);
+		for (x=[-1,1]) for (y=[-1,1]) translate([x*dx_guidey/2,y*headPlate_dy*0.4,head_bearing_axis_z]) rotate([0,90,0])cylinder(r=2,h=40,$fn=20,center=true);
+			}
 //example of extuder:    
- translate([0,0,dz_guidey+profile_size/2+headPlateThickness])color("blue")rotate([0,0,0])import("extruder.stl");    
-
+ translate([0,0,headPlateThickness])color("blue")rotate([0,0,0])import("extruder.stl");    
+	}
 
 //pulleys fixed on the Y guides:
 for (y=[-1,1])translate([-dx_guidey/2,y*(profiley_length*0.45-bearing_D),z_belts]) bearing();
@@ -143,13 +168,16 @@ for (y=[-1,1])translate([-dx_guidey/2,y*(profiley_length*0.45-bearing_D),z_belts
 translate([0,0,z_belts])
 {
 
-coef=0.45;
+coef=0.46;
 for (y=[-1,1])
 	{
+	//stepper holder:
+	translate([-profilex_length/2+motNema17Side/2,y*profiley_length*coef,-17])stepper_holder();
+		
 	//stepper motors:
-	translate([-profilex_length/2+motNema17Side/2,y*profiley_length*coef,-bearing_th])rotate([0,-90,0])color("skyblue")motor_nema17();
-	//pulleys on steppers:
-	translate([-profilex_length/2+motNema17Side/2,y*profiley_length*coef,0]) bearing();
+	translate([-profilex_length/2+motNema17Side/2,y*profiley_length*coef,-17])rotate([0,-90,0])color("skyblue")motor_nema17();
+	//GT2 pulleys on steppers:
+	color("grey")translate([-profilex_length/2+motNema17Side/2,y*profiley_length*coef,-pulleyThickness*0.7]) pulley();//bearing();
 	//pulleys on the other side:
 	translate([profilex_length*0.47,y*profiley_length*coef,0]) bearing();
 	}
@@ -168,6 +196,21 @@ for (y=[-1,1])
 
 
 
+//stepper motor holder:
+module stepper_holder()
+{
+difference()
+	{
+	translate([-motNema17Side/2,-motNema17Side/2,0])cube([motNema17Side,65,4]);
+	translate([0,0,-1])cylinder(r=(motNema17FrontD+1)/2,h=20,$fn=30);
+	for (x=[-1,1]) translate([10*x,33.5,-1])cylinder(r=5/2,h=20,$fn=30);
+	for (x=[-1,1])for (y=[-1,1])translate([motNema17ScrewsDist/2*x,motNema17ScrewsDist/2*y,-1])cylinder(r=3.5/2,h=20,$fn=30);
+	}
+}
+	
+	
+	
+	
 module xtrailPlate()
 {
 xtrailPlate_dz=profile_size;
@@ -314,8 +357,8 @@ module bearingAdaptor()
 translate([0,0,-bearing_th/2])
 difference()
     {
-    cylinder(r=bearing_dint/2,h=bearing_th);
-    translate([0,0,-1])cylinder(r=profile_screw_D/2,h=bearing_th+2);  
+    cylinder(r=bearing_dint/2,h=bearing_th,$fn=20);
+    translate([0,0,-1])cylinder(r=profile_screw_D/2,h=bearing_th+2,$fn=20);  
     }   
 }
 
@@ -333,7 +376,21 @@ difference()
     }
 }
 
-
+module pulley()
+{
+difference()
+   {
+	union()
+		{
+		cylinder(r=pulleyDiameter/2,h=pulleyThickness/2); 
+		translate([0,0,pulleyThickness*0.5])cylinder(r=pulleyTeethDiameter/2,h=pulleyThickness/2,$fn=30); 
+		translate([0,0,pulleyThickness*0.9])cylinder(r=pulleyDiameter/2,h=pulleyThickness*0.1); 
+		}
+    translate([0,0,-1])	cylinder(r=motNema17AxisD/2,h=pulleyThickness+2,$fn=30); 
+		n=20;
+	for (a=[0:n-1]) rotate([0,0,a*360/n]) translate([pulleyTeethDiameter*0.5,0,pulleyThickness*0.7]) cube([2,1,pulleyThickness*0.4],center=true);
+    }
+}
 
 
 module motor_nema17()

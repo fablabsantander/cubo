@@ -10,6 +10,8 @@ The design is parametrized as much as possible. The elements choosen for the fir
 - RatRig profiles
 - 627 bearings
 - wood/plexiglass plates
+- complex pieces are 3D printed
+- the XY movement follow the "coreXY" scheme (see www.corexy.com)
 
 Coding conventions for openscad files:
 - try to comment every decision in the design

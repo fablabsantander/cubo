@@ -59,7 +59,7 @@ head_Y=0;
 
 
 //the CUBE machine mounted:
-//ensemble();
+ensemble();
 
 //TO 3D PRINT:
 //rotate([-90,0,0])xtrailPlate();
@@ -70,7 +70,7 @@ head_Y=0;
 //rotate([180,0,0])head_plateform();
 //rotate([-90,0,0])head_bearing_holder();
 //pulley_washer();
-rotate([180,0,0])extruderHolder();
+//rotate([180,0,0])extruderHolder();
 
 //dim cube:
 thickness_panel = 10;

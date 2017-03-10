@@ -59,8 +59,9 @@ head_Y=0;
 
 
 //the CUBE machine mounted:
-ensemble();
+//ensemble();
 
+//TO 3D PRINT:
 //rotate([-90,0,0])xtrailPlate();
 //bearingPusher();
 //bearingAdaptor(); 
@@ -69,6 +70,7 @@ ensemble();
 //rotate([180,0,0])head_plateform();
 //rotate([-90,0,0])head_bearing_holder();
 //pulley_washer();
+rotate([180,0,0])extruderHolder();
 
 //dim cube:
 thickness_panel = 10;
@@ -90,8 +92,7 @@ mirror([1,0,0])translate([profilex_length/2,0,0]) provisory_side_plate();
 
 	
 //guides for x translation
-for (i=[-1,1])
-translate([-profilex_length/2,i*(-profiley_length/2-10-bearing_th/2),0])rotate([0,90,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
+for (i=[-1,1])translate([-profilex_length/2,i*(-profiley_length/2-10-bearing_th/2),0])rotate([0,90,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
 
 //guides for y translation
 translate([head_X,0,0])//Y carriage ensemble
@@ -117,9 +118,7 @@ for (j=[-1,1]) translate([0,j*(profiley_length/2+bearing_th/2+10),-dz_guidey])
 	rotate([90,0,0])bearingAdaptor();    
 	//screw for bearings:
 	color([0.4,0.4,0.4])translate([0,-profile_size/2,0])rotate([90,0,0])cylinder(r=profile_screw_D/2,h=30,$fn=30,center=true);
-   }
-	 
-	 
+   }		 
 	 
 //xtrail side plates:
 translate([0,profiley_length/2+xtrailPlateThickness/2,dz_guidey+profile_size/2])
@@ -148,6 +147,8 @@ translate([0,head_Y,dz_guidey])
 	//translate([0,0,headPlateThickness])color("blue")rotate([0,0,0])import("extruder.stl");  
 	//extruder head alone:
 	color("gray")translate([0,0,5])extruder();  
+	
+	color([0.2,0.3,0.2,0.8])translate([0,0,5])extruderHolder();
 	}
 
 //pulleys fixed on the Y guides:
@@ -243,6 +244,9 @@ difference()
 	for (v=[-1,0])mirror([0,v,0])translate([0,0,-head_bearing_axis_z*1.65])rotate([10,0,0])cube([headPlate_dx*2,headPlate_dy,headPlate_dx/3],center=true);
 	}
 }
+
+
+
 
 //head lower bearing holder:
 module head_bearing_holder()
@@ -368,6 +372,37 @@ difference()
 	}
 	
 }
+
+
+/**
+hold the 3D printing extruder:
+*/
+module extruderHolder()
+{
+dx=25;
+dy=58;
+d_extruder=16;
+difference()
+	{
+	union()
+		{
+		scale([1,2.2,1])cylinder(r=14,h=4,$fn=60);
+		translate([0,0,-7])cylinder(r=13,h=7,$fn=60);
+		}
+	//translate([-dx/2,-dy/2,0]) cube([dx,dy,5]);
+	//holes to fix to the head:
+	for (y=[-1,1])translate([0,25*y,-10])cylinder(r=2,h=50,$fn=30);
+	//hole for the extruder to go through:
+	translate([0,0,-20])cylinder(r=(d_extruder+1)/2,h=30,$fn=30);
+	//hole to press the extruder:
+	translate([0,0,-2])rotate([0,90,0])cylinder(r=(3)/2,h=30,$fn=30,center=true);
+	
+	}
+}
+
+
+
+
 
 //windows cube:
 module cover()

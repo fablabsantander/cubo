@@ -2,14 +2,10 @@
 //machine "cubo"
 //licence creative common 
 
-
-
-
-
-
 //profile:
 profilex_length=500;
 profiley_length=500;
+profilez_length=500;
 profile_size=20;
 profile_screw_D=5;
 //bearing:
@@ -53,15 +49,15 @@ inter_pulleys_y=profiley_length*0.46;
 head_bearing_axis_z=profile_size/2+bearing_D/2-1.5;
 
 
-head_X=50;
+head_X=150;
 head_Y=0;
 
 
 
 //the CUBE machine mounted:
 ensemble();
+//structure();
 
-//TO 3D PRINT:
 //rotate([-90,0,0])xtrailPlate();
 //bearingPusher();
 //bearingAdaptor(); 
@@ -70,7 +66,6 @@ ensemble();
 //rotate([180,0,0])head_plateform();
 //rotate([-90,0,0])head_bearing_holder();
 //pulley_washer();
-//rotate([180,0,0])extruderHolder();
 
 //dim cube:
 thickness_panel = 10;
@@ -80,19 +75,26 @@ h_stop_extruder = 120;
 height_cube = profilex_length+h_stop_extruder+2*thickness_panel;
 
 
+module structure()
+{
+translate([profilex_length/2,0,0]) provisory_side_plate();
+mirror([1,0,0])translate([profilex_length/2,0,0]) provisory_side_plate();
+provisory_zsystem();
+  
+}
+
 
 module ensemble()
 {
 //the clothes of the machine:
 //cover();
-
-
-translate([profilex_length/2,0,0]) provisory_side_plate();
-mirror([1,0,0])translate([profilex_length/2,0,0]) provisory_side_plate();
+    
+structure();
 
 	
 //guides for x translation
-for (i=[-1,1])translate([-profilex_length/2,i*(-profiley_length/2-10-bearing_th/2),0])rotate([0,90,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
+for (i=[-1,1])
+translate([-profilex_length/2,i*(-profiley_length/2-10-bearing_th/2),0])rotate([0,90,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
 
 //guides for y translation
 translate([head_X,0,0])//Y carriage ensemble
@@ -118,7 +120,9 @@ for (j=[-1,1]) translate([0,j*(profiley_length/2+bearing_th/2+10),-dz_guidey])
 	rotate([90,0,0])bearingAdaptor();    
 	//screw for bearings:
 	color([0.4,0.4,0.4])translate([0,-profile_size/2,0])rotate([90,0,0])cylinder(r=profile_screw_D/2,h=30,$fn=30,center=true);
-   }		 
+   }
+	 
+	 
 	 
 //xtrail side plates:
 translate([0,profiley_length/2+xtrailPlateThickness/2,dz_guidey+profile_size/2])
@@ -147,8 +151,6 @@ translate([0,head_Y,dz_guidey])
 	//translate([0,0,headPlateThickness])color("blue")rotate([0,0,0])import("extruder.stl");  
 	//extruder head alone:
 	color("gray")translate([0,0,5])extruder();  
-	
-	color([0.2,0.3,0.2,0.8])translate([0,0,5])extruderHolder();
 	}
 
 //pulleys fixed on the Y guides:
@@ -200,6 +202,9 @@ color("blue")for (x=[-1,1]) translate([head_X-x*dx_guidey/2+x*bearing_D/2,-inter
 
 }
 
+
+
+
 }
 
 
@@ -244,9 +249,6 @@ difference()
 	for (v=[-1,0])mirror([0,v,0])translate([0,0,-head_bearing_axis_z*1.65])rotate([10,0,0])cube([headPlate_dx*2,headPlate_dy,headPlate_dx/3],center=true);
 	}
 }
-
-
-
 
 //head lower bearing holder:
 module head_bearing_holder()
@@ -373,37 +375,6 @@ difference()
 	
 }
 
-
-/**
-hold the 3D printing extruder:
-*/
-module extruderHolder()
-{
-dx=25;
-dy=58;
-d_extruder=16;
-difference()
-	{
-	union()
-		{
-		scale([1,2.2,1])cylinder(r=14,h=4,$fn=60);
-		translate([0,0,-7])cylinder(r=13,h=7,$fn=60);
-		}
-	//translate([-dx/2,-dy/2,0]) cube([dx,dy,5]);
-	//holes to fix to the head:
-	for (y=[-1,1])translate([0,25*y,-10])cylinder(r=2,h=50,$fn=30);
-	//hole for the extruder to go through:
-	translate([0,0,-20])cylinder(r=(d_extruder+1)/2,h=30,$fn=30);
-	//hole to press the extruder:
-	translate([0,0,-2])rotate([0,90,0])cylinder(r=(3)/2,h=30,$fn=30,center=true);
-	
-	}
-}
-
-
-
-
-
 //windows cube:
 module cover()
 {
@@ -473,6 +444,42 @@ difference()
 	translate ([0,-dy/2,-h+20]) cube([thickness_panel,dy,h]);
 	for (y=[-1,1])translate ([profilex_length*0.3,y*(inter_guides_x),0])rotate([0,90,0])cylinder(h=200,r=5/2,$fn=20);
 	}
+}    
+    
+    
+module provisory_zsystem()
+{
+    
+//guides for x translation
+for (i=[-1,1])
+translate([-profilex_length/2,i*(-profiley_length/2-10-bearing_th/2),0])rotate([0,90,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
+    
+th=thickness_panel;
+dx=profilex_length+th*4;
+dy=profiley_length+50;
+h=550;
+l1=100; //side plates width
+l2=80; //back plate width
+l3=100;//front plate width
+inter_zguides=300;
+
+//base plate:
+color("blue") translate([-dx/2,-l1-20,-h])cube([dx,dy/2+l1+profile_size/2+motNema17Side/2,th]);
+//guides for z translation
+for (x=[-1,1])
+translate([-inter_zguides/2*x,(dy/2)+profile_size/2*0-th,-h+th])rotate([0,0,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
+//side plates
+for (c=[0,1]) mirror([c,0,0])
+translate ([dx/2-th,-l1-20,-h+th]) cube([th,l1,h+10]);
+//back plate
+color("red")translate ([-(dx-2*th)/2,dy/2,-l2+20]) cube([(dx-2*th),th,l2]);
+//front plate:
+color("red")translate ([-(dx)/2,-120,-h+th]) cube([(dx),th,l3]);
+
+echo("base plate size (mm):",dx,dy-80,th);
+echo("side plates (2x) size (mm):",l1,h+10,th);
+echo("back plate size (mm):",dx-2*th,l2,th);
+echo("front plate size (mm):",dx,l3,th);
 }
 
 

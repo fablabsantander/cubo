@@ -75,13 +75,78 @@ h_stop_extruder = 120;
 height_cube = profilex_length+h_stop_extruder+2*thickness_panel;
 
 
-module structure()
+module plates()
 {
-translate([profilex_length/2,0,0]) provisory_side_plate();
-mirror([1,0,0])translate([profilex_length/2,0,0]) provisory_side_plate();
-provisory_zsystem();
-  
+//translate([profilex_length/2,0,0]) provisory_side_plate();
+//mirror([1,0,0])translate([profilex_length/2,0,0]) provisory_side_plate();
+//translate([profilex_length/2,0,0]) side_plate();
+//for (c=[0,1]) mirror([c,0,0])translate([profilex_length/2,0,0]) side_plate();
+//front plate:
+th=10;
+dx=profilex_length;
+h=560;//side plate height
+l3=200;//front plate height
+ 
+
+dx_base=profilex_length+2*th;
+dy=profiley_length+50;
+//l1=100; //side plates width
+h2=200;//side plate noze height
+dy2=profiley_length+50;//side plate depth
+dy_nose=dy2*0.25;//nose depth
+rad=dy_nose/2;
+hup=profile_size*2;
+
+color=[.6,.6,.9];
+//base plate:
+color(color) translate([-dx_base/2,-dy2/2+dy_nose,-h])cube([dx_base,dy2-dy_nose,th]);
+//front plate;
+color(color)translate ([-(dx)/2,-dy2/2+dy_nose,-h+th])rotate([13,0,0]) cube([(dx),th,l3]);
+
+//side plates
+color(color)for (c=[0,1]) mirror([c,0,0])translate([profilex_length/2+th,0,0]) 
+{
+rotate([0,-90,0])linear_extrude(height=th)
+	{
+	polygon([
+		// z  y
+		[hup,-dy2/2],
+		[hup,dy2/2],
+		[-h+th,dy2/2],
+		[-h+th,-dy2/2+dy_nose]
+		]);
+	}
 }
+//side plates
+//for (c=[0,1]) mirror([c,0,0])translate([profilex_length/2,0,0]) 
+//	{
+//	color("orange")
+//	difference()
+//		{
+//		union()
+//			{
+//			//top:
+//			translate ([0,-dy2/2,-h2+20]) cube([thickness_panel,dy2,h2]);
+//			//bottom:	
+//			translate ([0,-dy2/2+dy_nose,-h+20]) cube([thickness_panel,dy2-dy_nose,h]);
+//			//round
+//			translate ([0,-dy2/2+rad,-h*0+20-h2])rotate([0,90,0])cylinder(r=rad,h=th,$fn=30);
+//			}
+//		for (y=[-1,1])translate ([profilex_length*0.3,y*(inter_guides_x),0])rotate([0,90,0])cylinder(h=200,r=5/2,$fn=20);
+//		}
+//	}
+
+
+
+echo("base plate size (mm):",dx_base,dy2-dy_nose,th);
+//echo("side plates (2x) size (mm):",l1,h+10,th);
+//echo("back plate size (mm):",dx-2*th,l2,th);
+echo("front plate size (mm):",dx,l3,th);
+
+	
+}
+
+
 
 
 module ensemble()
@@ -89,8 +154,10 @@ module ensemble()
 //the clothes of the machine:
 //cover();
     
-structure();
+plates();
 
+provisory_zsystem();
+ 
 	
 //guides for x translation
 for (i=[-1,1])
@@ -445,6 +512,12 @@ difference()
 	for (y=[-1,1])translate ([profilex_length*0.3,y*(inter_guides_x),0])rotate([0,90,0])cylinder(h=200,r=5/2,$fn=20);
 	}
 }    
+
+
+
+
+
+
     
     
 module provisory_zsystem()
@@ -464,22 +537,15 @@ l3=100;//front plate width
 inter_zguides=300;
 
 //base plate:
-color("blue") translate([-dx/2,-l1-20,-h])cube([dx,dy/2+l1+profile_size/2+motNema17Side/2,th]);
+//color("blue") translate([-dx/2,-l1-20,-h])cube([dx,dy/2+l1+profile_size/2+motNema17Side/2,th]);
 //guides for z translation
 for (x=[-1,1])
 translate([-inter_zguides/2*x,(dy/2)+profile_size/2*0-th,-h+th])rotate([0,0,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
 //side plates
-for (c=[0,1]) mirror([c,0,0])
-translate ([dx/2-th,-l1-20,-h+th]) cube([th,l1,h+10]);
+//for (c=[0,1]) mirror([c,0,0])translate ([dx/2-th,-l1-20,-h+th]) cube([th,l1,h+10]);
 //back plate
-color("red")translate ([-(dx-2*th)/2,dy/2,-l2+20]) cube([(dx-2*th),th,l2]);
-//front plate:
-color("red")translate ([-(dx)/2,-120,-h+th]) cube([(dx),th,l3]);
+//color("red")translate ([-(dx-2*th)/2,dy/2,-l2+20]) cube([(dx-2*th),th,l2]);
 
-echo("base plate size (mm):",dx,dy-80,th);
-echo("side plates (2x) size (mm):",l1,h+10,th);
-echo("back plate size (mm):",dx-2*th,l2,th);
-echo("front plate size (mm):",dx,l3,th);
 }
 
 

@@ -1,7 +1,8 @@
 # cubo
 ![xrail test](http://www.fablabsantander.org/files/maquinas/cubo/cubo.png)
 
-Machine for 3D printing and laser engraving
+Machine for 3D printing (and laser engraving).
+
 Some members of the FabLab Santander have committed themselves to build the machines of the lab in a co-creation process.
 This machine is a cubic shape 3D printer with option of laser engraving.
 This side size of the cube is more or less 500mm.

@@ -81,35 +81,42 @@ module plates()
 //mirror([1,0,0])translate([profilex_length/2,0,0]) provisory_side_plate();
 //translate([profilex_length/2,0,0]) side_plate();
 //for (c=[0,1]) mirror([c,0,0])translate([profilex_length/2,0,0]) side_plate();
+
+//side metalic bar for the XY system		
+bar_th=3; 
+
 //front plate:
 th=10;
-dx=profilex_length;
+dx=profilex_length+2*bar_th;
 h=560;//side plate height
-l3=200;//front plate height
- 
+l3=130;//front plate height
 
-dx_base=profilex_length+2*th;
+dx_base=profilex_length+2*th+2*bar_th;
 dy=profiley_length+50;
 //l1=100; //side plates width
 h2=200;//side plate noze height
 dy2=profiley_length+50;//side plate depth
 dy_nose=dy2*0.25;//nose depth
 rad=dy_nose/2;
-hup=profile_size*2;
+hup=profile_size*2.5;
+	
+//side metalic bar for the XY system 
+color([0.8,0.8,0.8])for (c=[0,1]) mirror([c,0,0])translate([profilex_length/2,-dy2/2,-profile_size/2])cube([bar_th,dy2,profile_size]);
 
 color=[.6,.6,.9];
 //base plate:
 color(color) translate([-dx_base/2,-dy2/2+dy_nose,-h])cube([dx_base,dy2-dy_nose,th]);
 //front plate;
-color(color)translate ([-(dx)/2,-dy2/2+dy_nose,-h+th])rotate([13,0,0]) cube([(dx),th,l3]);
+color(color)translate ([-dx/2,-dy2/2+dy_nose,-h+th])rotate([16,0,0]) cube([dx,th,l3]);
 
 //side plates
-color(color)for (c=[0,1]) mirror([c,0,0])translate([profilex_length/2+th,0,0]) 
+color(color)for (c=[0,1]) mirror([c,0,0])translate([profilex_length/2+th+bar_th,0,0]) 
 {
 rotate([0,-90,0])linear_extrude(height=th)
 	{
 	polygon([
 		// z  y
+		[-profile_size*4,-dy2/2],
 		[hup,-dy2/2],
 		[hup,dy2/2],
 		[-h+th,dy2/2],
@@ -545,6 +552,13 @@ translate([-inter_zguides/2*x,(dy/2)+profile_size/2*0-th,-h+th])rotate([0,0,0])c
 //for (c=[0,1]) mirror([c,0,0])translate ([dx/2-th,-l1-20,-h+th]) cube([th,l1,h+10]);
 //back plate
 //color("red")translate ([-(dx-2*th)/2,dy/2,-l2+20]) cube([(dx-2*th),th,l2]);
+
+
+
+//bed
+dxbed=profilex_length-100;
+dybed=profiley_length-100;
+color([1,1,1,0.7])translate([0,30,-400])cube([dxbed,dybed,5],center=true);
 
 }
 

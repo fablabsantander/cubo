@@ -1,5 +1,7 @@
 # cubo
 ![xrail test](http://www.fablabsantander.org/files/maquinas/cubo/cubo.png)
+![xrail test](http://www.fablabsantander.org/files/maquinas/cubo/cubo_acabado.png)
+
 
 Machine for 3D printing (and laser engraving).
 

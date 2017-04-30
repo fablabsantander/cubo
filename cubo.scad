@@ -8,10 +8,21 @@ profiley_length=500;
 profilez_length=500;
 profile_size=20;
 profile_screw_D=5;
-//bearing:
+
+// height
+h=560;//side plate height
+
+//plates :
+th=10; //side and base plate thickness
+back_th=3;//back plate thickness
+
+
+//bearing 627:
 bearing_D=22;
 bearing_dint=7;
 bearing_th=7;
+
+
 
 //distance between the 2 guides x
 inter_guides_x=profiley_length/2+10+bearing_th/2;
@@ -48,6 +59,11 @@ inter_pulleys_y=profiley_length*0.46;
 //head plateform parameters:
 head_bearing_axis_z=profile_size/2+bearing_D/2-1.5;
 
+//PLA coil:
+d_PLA_coil_inner=51;
+d_PLA_coil_outer=200;
+h_PLA_coil=72;
+
 
 head_X=150;
 head_Y=0;
@@ -55,9 +71,11 @@ head_Y=0;
 
 
 //the CUBE machine mounted:
-ensemble();
+//ensemble();
 //structure();
 
+
+//------------  3D print: -------------------
 //rotate([-90,0,0])xtrailPlate();
 //bearingPusher();
 //bearingAdaptor(); 
@@ -66,13 +84,21 @@ ensemble();
 //rotate([180,0,0])head_plateform();
 //rotate([-90,0,0])head_bearing_holder();
 //pulley_washer();
+//rotate([90,0,0])PLA_pulley_holder();
+//rotate([0,90,0])PLA_pulley();
+PLA_coil_holder();
+//------------  3D print: -------------------
 
 //dim cube:
-thickness_panel = 10;
 cube_length_x = profilex_length+2*thickness_panel;
 cube_length_y = profiley_length+2*profile_size;
 h_stop_extruder = 120;
 height_cube = profilex_length+h_stop_extruder+2*thickness_panel;
+
+//z system:
+inter_zguides=300;
+
+
 
 
 module plates()
@@ -83,31 +109,38 @@ module plates()
 //for (c=[0,1]) mirror([c,0,0])translate([profilex_length/2,0,0]) side_plate();
 
 //side metalic bar for the XY system		
-bar_th=3; 
+bar_th=4; 
 
 //front plate:
-th=10;
 dx=profilex_length+2*bar_th;
-h=560;//side plate height
 l3=130;//front plate height
 
 dx_base=profilex_length+2*th+2*bar_th;
 dy=profiley_length+50;
 //l1=100; //side plates width
 h2=200;//side plate noze height
+backSpace=50;//space at the back for the Z system
 dy2=profiley_length+50;//side plate depth
 dy_nose=dy2*0.25;//nose depth
 rad=dy_nose/2;
 hup=profile_size*2.5;
 	
 //side metalic bar for the XY system 
-color([0.8,0.8,0.8])for (c=[0,1]) mirror([c,0,0])translate([profilex_length/2,-dy2/2,-profile_size/2])cube([bar_th,dy2,profile_size]);
-
+color([0.8,0.8,0.8])for (c=[0,1]) mirror([c,0,0])
+{
+	difference()
+	{
+	translate([profilex_length/2,-dy2/2,-profile_size/2])cube([bar_th,dy2,profile_size]);
+	for (y=[-1,1])translate ([profilex_length*0.3,y*(inter_guides_x),0])rotate([0,90,0])cylinder(h=200,r=5/2,$fn=20);	}
+}
 color=[.6,.6,.9];
 //base plate:
-color(color) translate([-dx_base/2,-dy2/2+dy_nose,-h])cube([dx_base,dy2-dy_nose,th]);
+color(color+[0.1,0,0]) translate([-dx_base/2,-dy2/2+dy_nose,-h])cube([dx_base,dy2-dy_nose+backSpace,th]);
 //front plate;
-color(color)translate ([-dx/2,-dy2/2+dy_nose,-h+th])rotate([16,0,0]) cube([dx,th,l3]);
+//color(color-[0.1,0,0])translate ([-dx/2,-dy2/2+dy_nose,-h+th])rotate([16,0,0]) cube([dx,th,l3]);
+
+//back plate;
+color(color-[0.1,0,0])translate ([-dx/2-th,-dy2/2+dy_nose+dy2-dy_nose+backSpace,-h])cube([dx+2*th,back_th,hup+h]);
 
 //side plates
 color(color)for (c=[0,1]) mirror([c,0,0])translate([profilex_length/2+th+bar_th,0,0]) 
@@ -118,8 +151,8 @@ rotate([0,-90,0])linear_extrude(height=th)
 		// z  y
 		[-profile_size*4,-dy2/2],
 		[hup,-dy2/2],
-		[hup,dy2/2],
-		[-h+th,dy2/2],
+		[hup,dy2/2+backSpace],
+		[-h+th,dy2/2+backSpace],
 		[-h+th,-dy2/2+dy_nose]
 		]);
 	}
@@ -145,8 +178,9 @@ rotate([0,-90,0])linear_extrude(height=th)
 
 
 
-echo("base plate size (mm):",dx_base,dy2-dy_nose,th);
-//echo("side plates (2x) size (mm):",l1,h+10,th);
+echo("base plate size (mm):",dx_base,dy2-dy_nose+backSpace,th);
+echo("side plates (2x) size (mm):",dy2/2+backSpace-(-dy2/2),hup-(-h+th),th);
+echo("dy nose (mm):",dy_nose);
 //echo("back plate size (mm):",dx-2*th,l2,th);
 echo("front plate size (mm):",dx,l3,th);
 
@@ -276,11 +310,21 @@ color("blue")for (x=[-1,1]) translate([head_X-x*dx_guidey/2+x*bearing_D/2,-inter
 
 }
 
+translate([-profilex_length/2+40,-100,-h+th])rotate([0,0,90])
+{
+PLA_pulley_holder();
+PLA_pulley();
+}
+
+translate([0,0,-h+th])rotate([0,0,90])
+{
+color("black")translate([0,0,5])PLA_coil();
+PLA_coil_holder();
+}
 
 
 
 }
-
 
 module head_plateform()
 {
@@ -528,34 +572,18 @@ difference()
     
     
 module provisory_zsystem()
-{
-    
-//guides for x translation
-for (i=[-1,1])
-translate([-profilex_length/2,i*(-profiley_length/2-10-bearing_th/2),0])rotate([0,90,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
-    
-th=thickness_panel;
+{ 
 dx=profilex_length+th*4;
 dy=profiley_length+50;
-h=550;
-l1=100; //side plates width
-l2=80; //back plate width
-l3=100;//front plate width
-inter_zguides=300;
 
-//base plate:
-//color("blue") translate([-dx/2,-l1-20,-h])cube([dx,dy/2+l1+profile_size/2+motNema17Side/2,th]);
-//guides for z translation
+//guides for z translation:
 for (x=[-1,1])
-translate([-inter_zguides/2*x,(dy/2)+profile_size/2*0-th,-h+th])rotate([0,0,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
-//side plates
-//for (c=[0,1]) mirror([c,0,0])translate ([dx/2-th,-l1-20,-h+th]) cube([th,l1,h+10]);
-//back plate
-//color("red")translate ([-(dx-2*th)/2,dy/2,-l2+20]) cube([(dx-2*th),th,l2]);
+translate([-inter_zguides/2*x,(dy/2)+profile_size/2,-h+th])rotate([0,0,0])color([0.2,0.2,0.2])import ("profil_ratrig_500mm.stl");
 
+// bearings for z movement:
+for (x=[-1,1])translate([-inter_zguides/2*x,(dy/2)+3*profile_size/2,-250])rotate([0,90,0])bearing();
 
-
-//bed
+//3D printing bed:
 dxbed=profilex_length-100;
 dybed=profiley_length-100;
 color([1,1,1,0.7])translate([0,30,-400])cube([dxbed,dybed,5],center=true);
@@ -666,6 +694,86 @@ difference()
 }
 	
 }
+
+
+//PLA_pulley();
+// PLA_pulley_holder();
+
+module PLA_pulley()
+{
+ri=8;
+re=14;
+ht=17;
+translate([0,0,17])rotate([0,90,0])translate([0,0,-(ht+2*ht/10)/2])difference()
+	{
+	union()
+		{
+		cylinder(r=re,h=ht/10,$fn=40);
+		translate([0,0,ht/10])cylinder(r1=re,r2=ri,h=ht/3,$fn=40);
+		translate([0,0,ht/10+ht/3])cylinder(r1=ri,r2=ri,h=ht/3,$fn=40);
+		translate([0,0,ht/10+2*ht/3])cylinder(r1=ri,r2=re,h=ht/3,$fn=40);
+		translate([0,0,ht/10+ht])cylinder(r=re,h=ht/10,$fn=40);
+		}
+	//hole to let throught a M4 screw:
+	translate([0,0,-1])cylinder(r=2.2,h=60,$fn=30);
+	}
+}
+
+
+module PLA_pulley_holder()
+{
+l=23;
+h=27;
+d=16;
+difference()
+	{
+	union()
+		{
+		for (r=[0,1]) mirror([r,0,0]) translate([l/2,-d/2,-1])cube([3,d,h]);	
+		translate([-l/2,-d/2,-1])cube([l,d,3]);		
+		}
+	//hole for base fixation:
+	translate([0,0,-4])cylinder(r=2.4,h=10,$fn=20);
+	//holes for axis, M4 threaded: 
+	translate([0,0,h-d/2])rotate([0,90,0])cylinder(r=1.6,h=80,$fn=20,center=true);
+	}
+
+}
+
+
+
+module PLA_coil()
+{
+difference()
+	{
+	cylinder(r=d_PLA_coil_outer/2,h=h_PLA_coil,$fn=100);
+	translate([0,0,-1])cylinder(r=d_PLA_coil_inner/2,h=h_PLA_coil+2,$fn=30);
+	}
+}
+
+module PLA_coil_holder()
+{
+th=3;
+bearing_D=22;
+bearing_dint=7;
+bearing_th=7;
+difference()
+	{
+	union()
+		{
+		for (a=[0,90]) rotate([0,0,a])
+		translate([-(d_PLA_coil_inner-2)/2,-th/2,0])cube([d_PLA_coil_inner-2,4,h_PLA_coil/2]);
+		for (a=[0,90]) rotate([0,0,a])
+		translate([-(d_PLA_coil_inner+10)/2,-th/2,0])cube([d_PLA_coil_inner+10,4,4]);
+		cylinder(r=bearing_D*1.5/2,h=bearing_th*2,$fn=20);
+		cylinder(r=bearing_dint*1.5/2,h=h_PLA_coil/2,$fn=20);
+		}
+	translate([0,0,-1])cylinder(r=(bearing_D+1)/2,h=bearing_th+1,$fn=20);
+	translate([0,0,-1])cylinder(r=(5.2)/2,h=h_PLA_coil,$fn=20);
+	}
+}
+
+
 
 
 

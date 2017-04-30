@@ -1,5 +1,5 @@
 # cubo
-![cubo design](http://www.fablabsantander.org/files/maquinas/cubo/cubo.png)
+![cubo design](http://www.fablabsantander.org/files/maquinas/cubo/cubo2.png)
 ![real build](http://www.fablabsantander.org/files/maquinas/cubo/cubo_acabado.jpg)
 
 

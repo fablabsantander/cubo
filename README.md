@@ -1,6 +1,6 @@
 # cubo
-![xrail test](http://www.fablabsantander.org/files/maquinas/cubo/cubo.png)
-![xrail test](http://www.fablabsantander.org/files/maquinas/cubo/cubo_acabado.png)
+![cubo design](http://www.fablabsantander.org/files/maquinas/cubo/cubo.png)
+![real build](http://www.fablabsantander.org/files/maquinas/cubo/cubo_acabado.jpg)
 
 
 Machine for 3D printing (and laser engraving).
